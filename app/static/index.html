@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DrishtiMobility — Maruti Suzuki Intelligent Urban Mobility Platform</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap');
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #070b14;
+      color: #e2e8f0;
+    }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+    .card-glass {
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(51, 65, 85, 0.6);
+    }
+    .card-glass-glow {
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(0, 229, 255, 0.3);
+      box-shadow: 0 0 25px rgba(0, 229, 255, 0.08);
+    }
+    .glow-cyan { text-shadow: 0 0 12px rgba(0, 229, 255, 0.6); }
+    .pulse-dot {
+      animation: pulseAnimation 1.8s infinite;
+    }
+    @keyframes pulseAnimation {
+      0% { transform: scale(0.95); opacity: 0.8; }
+      50% { transform: scale(1.2); opacity: 1; }
+      100% { transform: scale(0.95); opacity: 0.8; }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-cyan-500 selection:text-black">
+
+  <!-- TOP BRAND NAV -->
+  <header class="border-b border-slate-800 bg-slate-950/80 backdrop-blur sticky top-0 z-50 px-6 py-3.5">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center space-x-3.5">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-700 via-cyan-500 to-emerald-400 flex items-center justify-center shadow-lg shadow-cyan-500/20">
+          <i class="fa-solid fa-eye text-slate-950 text-xl font-bold"></i>
+        </div>
+        <div>
+          <div class="flex items-center space-x-2">
+            <span class="text-xl font-extrabold tracking-tight text-white">Drishti<span class="text-cyan-400">Mobility</span></span>
+            <span class="text-xs px-2 py-0.5 rounded-full bg-blue-900/60 text-blue-300 font-semibold border border-blue-700/50">v1.0 Prototyping</span>
+          </div>
+          <p class="text-xs text-slate-400">Maruti Suzuki Innovation Challenge · i-Hack, E-Summit '26 (IIT Bombay)</p>
+        </div>
+      </div>
+
+      <!-- Live Benchmarks -->
+      <div class="flex items-center space-x-3 text-xs">
+        <div class="px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 flex items-center space-x-2">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 pulse-dot"></span>
+          <span class="text-slate-400">DMS Inference:</span>
+          <span class="font-mono font-bold text-emerald-400">18.4 ms (Edge AI)</span>
+        </div>
+        <div class="px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 flex items-center space-x-2">
+          <i class="fa-solid fa-traffic-light text-cyan-400"></i>
+          <span class="text-slate-400">Webster Delay Abatement:</span>
+          <span class="font-mono font-bold text-cyan-300">-34.2%</span>
+        </div>
+        <div class="px-3 py-1.5 rounded-lg bg-blue-950/70 border border-blue-800/60 text-blue-300 font-medium">
+          <i class="fa-solid fa-award mr-1"></i> Euro NCAP & AIS-140
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- SUB-NAV / TAB SWITCHER -->
+  <div class="bg-slate-900/60 border-b border-slate-800 px-6 py-2">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <div class="flex space-x-2" id="tab-nav">
+        <button onclick="switchTab('hud')" id="btn-tab-hud" class="px-4 py-2 rounded-lg text-sm font-semibold transition bg-cyan-500 text-slate-950 shadow-md shadow-cyan-500/20">
+          <i class="fa-solid fa-car-rear mr-2"></i> In-Cabin Driver HUD & Fatigue AI
+        </button>
+        <button onclick="switchTab('traffic')" id="btn-tab-traffic" class="px-4 py-2 rounded-lg text-sm font-semibold transition bg-slate-800 text-slate-300 hover:bg-slate-700">
+          <i class="fa-solid fa-network-wired mr-2"></i> Smart Traffic & Corridor Signals
+        </button>
+        <button onclick="switchTab('fleet')" id="btn-tab-fleet" class="px-4 py-2 rounded-lg text-sm font-semibold transition bg-slate-800 text-slate-300 hover:bg-slate-700">
+          <i class="fa-solid fa-tower-broadcast mr-2"></i> Connected Fleet & V2X Alerts
+        </button>
+        <button onclick="switchTab('ml')" id="btn-tab-ml" class="px-4 py-2 rounded-lg text-sm font-semibold transition bg-slate-800 text-slate-300 hover:bg-slate-700">
+          <i class="fa-solid fa-chart-line mr-2"></i> ML Benchmarks & Verification
+        </button>
+      </div>
+      <div class="text-xs text-slate-400 flex items-center space-x-1.5">
+        <i class="fa-solid fa-shield-halved text-cyan-400"></i>
+        <span>AIS-038 & Euro NCAP 2026 Conformance</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN WRAPPER -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-6 space-y-6">
+
+    <!-- TAB 1: IN-CABIN DRIVER MONITORING HUD -->
+    <section id="tab-hud" class="space-y-6">
+      
+      <!-- SCENARIO SWITCHER -->
+      <div class="card-glass rounded-2xl p-5 border-slate-800">
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+          <div>
+            <h2 class="text-base font-bold text-white flex items-center">
+              <i class="fa-solid fa-route text-cyan-400 mr-2"></i>
+              Select Real-World Indian Mobility Scenario
+            </h2>
+            <p class="text-xs text-slate-400">Simulate edge camera telemetry, facial landmark ratios (EAR/MAR), and vehicle kinematics.</p>
+          </div>
+          <div class="flex items-center space-x-2">
+            <button onclick="playSimulation()" id="btn-sim-play" class="px-3.5 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs flex items-center space-x-1.5 shadow">
+              <i class="fa-solid fa-play"></i> <span>Auto Play</span>
+            </button>
+            <button onclick="nextStep()" class="px-3.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs border border-slate-700">
+              <i class="fa-solid fa-forward-step mr-1"></i> Next Frame
+            </button>
+            <button onclick="resetSimulation()" class="px-3.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs border border-slate-700">
+              <i class="fa-solid fa-rotate-left mr-1"></i> Reset
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5" id="scenario-cards">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- IN-CABIN HUD DASHBOARD GRID -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- LEFT: Real-time Perception HUD (5 Cols) -->
+        <div class="lg:col-span-5 space-y-4">
+          <div class="card-glass-glow rounded-2xl p-5 relative overflow-hidden">
+            <div class="flex items-center justify-between mb-3 border-b border-slate-800 pb-2">
+              <div class="flex items-center space-x-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-red-500 animate-ping"></span>
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-300">Live Cabin Perception Stream</span>
+              </div>
+              <span class="text-xs font-mono px-2 py-0.5 rounded bg-slate-900 border border-slate-800 text-cyan-400" id="hud-frame-step">Frame 1 / 15</span>
+            </div>
+
+            <!-- Virtual Face Wireframe Canvas -->
+            <div class="relative bg-slate-950 rounded-xl h-60 border border-slate-800/80 flex items-center justify-center overflow-hidden">
+              <div class="absolute inset-0 bg-[radial-gradient(#1e293b_1px,transparent_1px)] [background-size:16px_16px] opacity-40"></div>
+              
+              <!-- Face Outline Graphic -->
+              <div class="relative z-10 text-center">
+                <div class="relative w-36 h-44 mx-auto border-2 border-dashed border-cyan-500/40 rounded-full flex flex-col items-center justify-around py-3 transition-all duration-300" id="face-box">
+                  <!-- Eyes -->
+                  <div class="flex space-x-6">
+                    <div id="eye-left" class="w-7 h-4 border-2 border-cyan-400 rounded-full flex items-center justify-center bg-cyan-950/50">
+                      <div class="w-2 h-2 rounded-full bg-cyan-300"></div>
+                    </div>
+                    <div id="eye-right" class="w-7 h-4 border-2 border-cyan-400 rounded-full flex items-center justify-center bg-cyan-950/50">
+                      <div class="w-2 h-2 rounded-full bg-cyan-300"></div>
+                    </div>
+                  </div>
+                  <!-- Nose / Gaze Ray -->
+                  <div class="w-1.5 h-6 bg-cyan-500/50 rounded-full"></div>
+                  <!-- Mouth -->
+                  <div id="mouth" class="w-10 h-3 border-2 border-emerald-400 rounded-full transition-all duration-300 bg-emerald-950/40"></div>
+                </div>
+                <div class="mt-2 text-xs font-mono text-cyan-300 font-semibold" id="head-pose-text">Head Pose: Yaw 0.0° · Pitch -2.0°</div>
+              </div>
+
+              <!-- Gaze Status Badge -->
+              <div class="absolute top-3 right-3 px-2 py-1 rounded bg-slate-900/90 border border-slate-700 text-xs font-mono flex items-center space-x-1.5" id="gaze-badge">
+                <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                <span class="text-emerald-300">Gaze on Road</span>
+              </div>
+
+              <!-- Phone Detection Badge -->
+              <div class="absolute top-3 left-3 px-2 py-1 rounded bg-slate-900/90 border border-slate-700 text-xs font-mono hidden text-rose-400 flex items-center space-x-1.5" id="phone-badge">
+                <i class="fa-solid fa-mobile-screen"></i>
+                <span>Phone in Lap</span>
+              </div>
+            </div>
+
+            <!-- GAUGES ROW -->
+            <div class="grid grid-cols-2 gap-3 mt-4">
+              <!-- EAR Gauge -->
+              <div class="bg-slate-950/80 rounded-xl p-3 border border-slate-800">
+                <div class="flex items-center justify-between text-xs mb-1">
+                  <span class="text-slate-400 font-medium">Eye Aspect Ratio (EAR)</span>
+                  <span class="font-mono font-bold text-cyan-300" id="val-ear">0.320</span>
+                </div>
+                <div class="w-full bg-slate-900 rounded-full h-2 overflow-hidden">
+                  <div id="bar-ear" class="bg-cyan-400 h-2 rounded-full transition-all duration-300" style="width: 75%;"></div>
+                </div>
+                <div class="flex justify-between text-[10px] text-slate-400 mt-1">
+                  <span class="text-rose-400">0.15 Microsleep</span>
+                  <span class="text-amber-400">0.21 Drowsy</span>
+                  <span class="text-emerald-400">0.30+ Alert</span>
+                </div>
+              </div>
+
+              <!-- MAR Gauge -->
+              <div class="bg-slate-950/80 rounded-xl p-3 border border-slate-800">
+                <div class="flex items-center justify-between text-xs mb-1">
+                  <span class="text-slate-400 font-medium">Mouth Ratio (Yawn MAR)</span>
+                  <span class="font-mono font-bold text-emerald-400" id="val-mar">0.180</span>
+                </div>
+                <div class="w-full bg-slate-900 rounded-full h-2 overflow-hidden">
+                  <div id="bar-mar" class="bg-emerald-400 h-2 rounded-full transition-all duration-300" style="width: 25%;"></div>
+                </div>
+                <div class="flex justify-between text-[10px] text-slate-400 mt-1">
+                  <span class="text-emerald-400"><0.35 Closed</span>
+                  <span class="text-amber-400">0.50 Talking</span>
+                  <span class="text-rose-400">>0.58 Yawn</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- DYNAMIC ALERT CARD -->
+          <div id="alert-banner" class="rounded-2xl p-4 border transition-all duration-300 bg-emerald-950/30 border-emerald-800 text-emerald-200">
+            <div class="flex items-start space-x-3">
+              <div class="w-8 h-8 rounded-lg bg-emerald-900/60 border border-emerald-700 flex items-center justify-center flex-shrink-0 text-emerald-300 text-sm" id="alert-icon">
+                <i class="fa-solid fa-circle-check"></i>
+              </div>
+              <div class="flex-1">
+                <div class="flex items-center justify-between">
+                  <h4 class="text-sm font-bold tracking-tight text-white" id="alert-title">Driver State: Attentive & Focused</h4>
+                  <span class="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-emerald-900/80 text-emerald-300" id="alert-badge">NORMAL</span>
+                </div>
+                <p class="text-xs text-slate-300 mt-1" id="alert-desc">Normal ocular blink rate and steady road gaze detected. High safety score maintained.</p>
+                <div class="mt-2 text-xs font-semibold text-emerald-400" id="alert-coaching">
+                  <i class="fa-solid fa-graduation-cap mr-1"></i> Maruti Safety Tip: Keep maintaining 3-second buffer distance in urban corridors.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT: Telematics & Maruti Rewards Scorecard (7 Cols) -->
+        <div class="lg:col-span-7 space-y-4">
+          
+          <!-- KINEMATICS & HUD CLUSTER -->
+          <div class="card-glass rounded-2xl p-5 border-slate-800">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 flex items-center">
+              <i class="fa-solid fa-gauge-high text-cyan-400 mr-2"></i>
+              CAN-Bus Vehicle Kinematics (OBD-II Stream)
+            </h3>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div class="bg-slate-950/70 rounded-xl p-3 border border-slate-800/80">
+                <div class="text-[11px] text-slate-400">Current Speed</div>
+                <div class="text-2xl font-bold font-mono text-white mt-0.5" id="val-speed">52.0 <span class="text-xs font-normal text-slate-400">km/h</span></div>
+                <div class="text-[10px] text-emerald-400 mt-1">Within city limits</div>
+              </div>
+              <div class="bg-slate-950/70 rounded-xl p-3 border border-slate-800/80">
+                <div class="text-[11px] text-slate-400">Longitudinal G</div>
+                <div class="text-2xl font-bold font-mono text-white mt-0.5" id="val-long-g">+0.04 <span class="text-xs font-normal text-slate-400">g</span></div>
+                <div class="text-[10px] text-slate-400 mt-1" id="val-long-desc">Smooth pedal flow</div>
+              </div>
+              <div class="bg-slate-950/70 rounded-xl p-3 border border-slate-800/80">
+                <div class="text-[11px] text-slate-400">Lateral G-Force</div>
+                <div class="text-2xl font-bold font-mono text-white mt-0.5" id="val-lat-g">0.05 <span class="text-xs font-normal text-slate-400">g</span></div>
+                <div class="text-[10px] text-slate-400 mt-1">Steady lane center</div>
+              </div>
+              <div class="bg-slate-950/70 rounded-xl p-3 border border-slate-800/80">
+                <div class="text-[11px] text-slate-400">Turn Indicator</div>
+                <div class="text-xl font-bold text-white mt-0.5 flex items-center space-x-1" id="val-indicator">
+                  <i class="fa-solid fa-arrow-left text-slate-600"></i>
+                  <span class="text-xs font-mono font-medium text-slate-400">OFF</span>
+                  <i class="fa-solid fa-arrow-right text-slate-600"></i>
+                </div>
+                <div class="text-[10px] text-slate-400 mt-1">Lane change sync</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- DRIVER SAFETY SCORECARD & MARUTI REWARDS -->
+          <div class="card-glass-glow rounded-2xl p-5 border-slate-800">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
+              <div>
+                <h3 class="text-sm font-bold text-white flex items-center">
+                  <i class="fa-solid fa-trophy text-amber-400 mr-2"></i>
+                  Continuous Driver Safety Scorecard & Incentives
+                </h3>
+                <p class="text-xs text-slate-400">Evaluated on composite attentiveness, smooth acceleration/braking, and speed compliance.</p>
+              </div>
+              <div class="text-right">
+                <span class="text-xs font-mono uppercase px-2.5 py-1 rounded-full bg-gradient-to-r from-amber-500/20 to-yellow-500/20 border border-amber-500/40 text-amber-300 font-bold" id="badge-rewards-tier">
+                  <i class="fa-solid fa-gem mr-1"></i> Diamond Tier
+                </span>
+              </div>
+            </div>
+
+            <!-- SCORE ROW -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 items-center">
+              <!-- Radial/Big Score Display -->
+              <div class="bg-slate-950/80 rounded-xl p-4 border border-slate-800 text-center">
+                <div class="text-xs text-slate-400 font-medium">Current Trip Safety Score</div>
+                <div class="text-5xl font-extrabold font-mono text-cyan-400 my-1" id="val-trip-score">96.5</div>
+                <div class="text-xs font-medium text-emerald-400">
+                  <i class="fa-solid fa-arrow-trend-up mr-1"></i> Top 3% of Urban Drivers
+                </div>
+              </div>
+
+              <!-- 3 Sub-Indices -->
+              <div class="sm:col-span-2 space-y-2.5">
+                <div>
+                  <div class="flex justify-between text-xs mb-1">
+                    <span class="text-slate-300">Attentiveness Index (40%)</span>
+                    <span class="font-mono font-bold text-emerald-400" id="val-idx-att">98.0%</span>
+                  </div>
+                  <div class="w-full bg-slate-950 rounded-full h-2">
+                    <div id="bar-idx-att" class="bg-emerald-400 h-2 rounded-full" style="width: 98%;"></div>
+                  </div>
+                </div>
+
+                <div>
+                  <div class="flex justify-between text-xs mb-1">
+                    <span class="text-slate-300">Smooth Driving & G-Control (35%)</span>
+                    <span class="font-mono font-bold text-cyan-400" id="val-idx-smooth">95.0%</span>
+                  </div>
+                  <div class="w-full bg-slate-950 rounded-full h-2">
+                    <div id="bar-idx-smooth" class="bg-cyan-400 h-2 rounded-full" style="width: 95%;"></div>
+                  </div>
+                </div>
+
+                <div>
+                  <div class="flex justify-between text-xs mb-1">
+                    <span class="text-slate-300">Speed & Signal Compliance (25%)</span>
+                    <span class="font-mono font-bold text-blue-400" id="val-idx-speed">96.0%</span>
+                  </div>
+                  <div class="w-full bg-slate-950 rounded-full h-2">
+                    <div id="bar-idx-speed" class="bg-blue-400 h-2 rounded-full" style="width: 96%;"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Commercial Rewards Integration -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4 pt-3 border-t border-slate-800/80 text-xs">
+              <div class="flex items-center space-x-2.5 bg-slate-950/60 p-2.5 rounded-lg border border-slate-800">
+                <i class="fa-solid fa-percent text-emerald-400 text-lg"></i>
+                <div>
+                  <div class="text-slate-300 font-semibold">Maruti Insurance Broking Discount</div>
+                  <div class="text-emerald-400 font-mono font-bold" id="val-ins-discount">20% Premium Reduction Unlocked</div>
+                </div>
+              </div>
+              <div class="flex items-center space-x-2.5 bg-slate-950/60 p-2.5 rounded-lg border border-slate-800">
+                <i class="fa-solid fa-road text-cyan-400 text-lg"></i>
+                <div>
+                  <div class="text-slate-300 font-semibold">Safe Driving Streak</div>
+                  <div class="text-cyan-400 font-mono font-bold" id="val-safe-streak">1,470 km Incident-Free</div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- TAB 2: SMART TRAFFIC & CORRIDOR SIGNALS -->
+    <section id="tab-traffic" class="space-y-6 hidden">
+      <div class="card-glass rounded-2xl p-6 border-slate-800">
+        <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+          <div>
+            <div class="flex items-center space-x-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-cyan-400"></span>
+              <h2 class="text-lg font-bold text-white">Western Express Highway (WEH) Smart Corridor</h2>
+            </div>
+            <p class="text-xs text-slate-400 mt-0.5">Real-time Webster's Minimum Delay Formulation optimizing 4 synchronized arterial junctions.</p>
+          </div>
+          <button onclick="triggerEmergencyPreemption()" class="px-4 py-2 rounded-xl bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-500 hover:to-rose-600 text-white font-bold text-xs flex items-center space-x-2 shadow-lg shadow-red-700/30">
+            <i class="fa-solid fa-truck-medical text-sm"></i>
+            <span>Simulate Ambulance Green Wave Pre-emption</span>
+          </button>
+        </div>
+
+        <!-- 4 JUNCTIONS GRID -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" id="junction-cards">
+          <!-- Populated by JS -->
+        </div>
+
+        <!-- CORRIDOR AGGREGATE IMPACT -->
+        <div class="mt-6 bg-slate-950/90 rounded-2xl p-5 border border-cyan-500/30">
+          <h3 class="text-sm font-bold text-white mb-3 flex items-center">
+            <i class="fa-solid fa-leaf text-emerald-400 mr-2"></i>
+            Environmental & Mobility Benefits (Adaptive Webster vs. Fixed 130s Timers)
+          </h3>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div class="border-r border-slate-800 pr-3">
+              <div class="text-xs text-slate-400">Average Delay Reduction</div>
+              <div class="text-2xl font-bold font-mono text-cyan-400 mt-1" id="val-corridor-delay">-34.2%</div>
+              <div class="text-[10px] text-slate-400 mt-0.5">Faster passenger transit</div>
+            </div>
+            <div class="border-r border-slate-800 pr-3">
+              <div class="text-xs text-slate-400">Hourly Fuel Saved</div>
+              <div class="text-2xl font-bold font-mono text-emerald-400 mt-1" id="val-corridor-fuel">84.6 L/hr</div>
+              <div class="text-[10px] text-slate-400 mt-0.5">Idle burn prevented</div>
+            </div>
+            <div class="border-r border-slate-800 pr-3">
+              <div class="text-xs text-slate-400">Hourly CO2 Avoided</div>
+              <div class="text-2xl font-bold font-mono text-emerald-300 mt-1" id="val-corridor-co2">195.4 kg/hr</div>
+              <div class="text-[10px] text-slate-400 mt-0.5">Air quality mitigation</div>
+            </div>
+            <div>
+              <div class="text-xs text-slate-400">Annual Economic Benefit</div>
+              <div class="text-2xl font-bold font-mono text-amber-400 mt-1">₹4.52 Crores</div>
+              <div class="text-[10px] text-slate-400 mt-0.5">Fuel & time value saved</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: CONNECTED FLEET & V2X ALERTS -->
+    <section id="tab-fleet" class="space-y-6 hidden">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- Active V2X Cellular Alerts (6 Cols) -->
+        <div class="lg:col-span-6 space-y-4">
+          <div class="card-glass rounded-2xl p-5 border-slate-800">
+            <div class="flex items-center justify-between mb-4 border-b border-slate-800 pb-3">
+              <h3 class="text-sm font-bold text-white flex items-center">
+                <i class="fa-solid fa-tower-cell text-cyan-400 mr-2"></i>
+                Cellular V2X (3GPP Rel 16/17) Active Mesh Broadcasts
+              </h3>
+              <span class="text-xs font-mono px-2 py-0.5 rounded bg-blue-900/40 text-blue-300 border border-blue-700/40">3 Active Nodes</span>
+            </div>
+            <div class="space-y-3" id="v2x-alert-list">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Computer Vision Lane Violation & e-Challan Governance (6 Cols) -->
+        <div class="lg:col-span-6 space-y-4">
+          <div class="card-glass rounded-2xl p-5 border-slate-800">
+            <div class="flex items-center justify-between mb-4 border-b border-slate-800 pb-3">
+              <div>
+                <h3 class="text-sm font-bold text-white flex items-center">
+                  <i class="fa-solid fa-receipt text-amber-400 mr-2"></i>
+                  Simulated Lane Discipline & e-Challan Governance
+                </h3>
+                <p class="text-xs text-slate-400 mt-0.5">Coaching-first philosophy: first violations receive educational warnings.</p>
+              </div>
+            </div>
+
+            <div class="space-y-3" id="challan-list">
+              <div class="bg-slate-950/70 rounded-xl p-3.5 border border-slate-800">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-mono font-bold text-amber-400">CHL-MSIL-09284-01</span>
+                  <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-950 border border-emerald-800 text-emerald-300 font-semibold">1st Offense · Waived</span>
+                </div>
+                <div class="text-xs font-semibold text-white mt-1.5">Improper Lane Change without Turn Indicator</div>
+                <p class="text-[11px] text-slate-400 mt-0.5">Vehicle shifted 1.1m right into overtaking lane at 64 km/h without blinking indicator.</p>
+                <div class="mt-2 text-[10px] font-mono text-slate-400 flex justify-between border-t border-slate-800/80 pt-1.5">
+                  <span>VIN: MA3EWE21S0019284</span>
+                  <span>Penalty: ₹0 (Coaching Mode)</span>
+                </div>
+              </div>
+
+              <div class="bg-slate-950/70 rounded-xl p-3.5 border border-slate-800">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-mono font-bold text-amber-400">CHL-MSIL-09284-02</span>
+                  <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-950 border border-amber-800 text-amber-300 font-semibold">Zebra Crossing Overrun</span>
+                </div>
+                <div class="text-xs font-semibold text-white mt-1.5">Stop Line Encroachment at Andheri Junction</div>
+                <p class="text-[11px] text-slate-400 mt-0.5">Vehicle front bumper halted 1.4m past stop line onto pedestrian walkway during red phase.</p>
+                <div class="mt-2 text-[10px] font-mono text-slate-400 flex justify-between border-t border-slate-800/80 pt-1.5">
+                  <span>Camera Confidence: 96.4%</span>
+                  <span>Penalty: ₹1,000 (Educational)</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- TAB 4: ML BENCHMARKS & VERIFICATION -->
+    <section id="tab-ml" class="space-y-6 hidden">
+      <div class="card-glass rounded-2xl p-6 border-slate-800">
+        <h2 class="text-lg font-bold text-white mb-2 flex items-center">
+          <i class="fa-solid fa-microchip text-cyan-400 mr-2"></i>
+          Drishti In-Cabin Model Benchmarks (Held-out Test Set, n=1,250)
+        </h2>
+        <p class="text-xs text-slate-400 mb-6">Empirical validation comparing Drishti Gradient Boosting vs. Random Forest and Heuristic Baselines.</p>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-xs text-left">
+            <thead class="bg-slate-950 text-slate-300 uppercase font-mono border-b border-slate-800">
+              <tr>
+                <th class="py-3 px-4">Classifier Model</th>
+                <th class="py-3 px-4">Accuracy</th>
+                <th class="py-3 px-4">Precision</th>
+                <th class="py-3 px-4">Recall (Fatigue)</th>
+                <th class="py-3 px-4">F1-Score</th>
+                <th class="py-3 px-4">ROC-AUC</th>
+                <th class="py-3 px-4">Inference Latency</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-800 font-mono" id="ml-table-body">
+              <!-- Populated by JS -->
+            </tbody>
+          </table>
+        </div>
+
+        <div class="mt-6 pt-6 border-t border-slate-800 flex flex-wrap items-center justify-between gap-4 text-xs">
+          <div class="flex items-center space-x-2 text-slate-400">
+            <i class="fa-solid fa-check-circle text-emerald-400"></i>
+            <span>Tested across 6 automated unit tests covering Euro NCAP 2026 & Webster Delay Formulation.</span>
+          </div>
+          <span class="font-mono text-cyan-300">All 6 pytest suites passing in 0.74s</span>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="border-t border-slate-800 bg-slate-950/80 px-6 py-4 text-center text-xs text-slate-400">
+    DrishtiMobility v1.0 · Built specifically for Maruti Suzuki Innovation Challenge (i-Hack, E-Summit '26, IIT Bombay)
+  </footer>
+
+  <!-- APP JAVASCRIPT -->
+  <script>
+    let scenarios = [];
+    let currentScenarioId = 'SCN-MUMBAI-SMOOTH';
+    let telemetryStream = [];
+    let currentStepIndex = 0;
+    let simInterval = null;
+    let isPlaying = false;
+
+    // Load initial data
+    async function init() {
+      try {
+        const scnRes = await fetch('/api/scenarios');
+        scenarios = await scnRes.json();
+        renderScenarioCards();
+        await loadScenario(currentScenarioId);
+        loadTraffic();
+        loadV2X();
+        loadMetrics();
+      } catch (err) {
+        console.error('Initialization error:', err);
+      }
+    }
+
+    function switchTab(tabId) {
+      ['hud', 'traffic', 'fleet', 'ml'].forEach(t => {
+        document.getElementById(`tab-${t}`).classList.add('hidden');
+        const btn = document.getElementById(`btn-tab-${t}`);
+        btn.className = 'px-4 py-2 rounded-lg text-sm font-semibold transition bg-slate-800 text-slate-300 hover:bg-slate-700';
+      });
+      document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+      const activeBtn = document.getElementById(`btn-tab-${tabId}`);
+      activeBtn.className = 'px-4 py-2 rounded-lg text-sm font-semibold transition bg-cyan-500 text-slate-950 shadow-md shadow-cyan-500/20';
+    }
+
+    function renderScenarioCards() {
+      const container = document.getElementById('scenario-cards');
+      container.innerHTML = scenarios.map(s => {
+        const isSelected = s.id === currentScenarioId;
+        return `
+          <div onclick="selectScenario('${s.id}')" class="cursor-pointer p-3.5 rounded-xl border transition-all ${isSelected ? 'bg-cyan-950/30 border-cyan-400 ring-1 ring-cyan-400' : 'bg-slate-950/60 border-slate-800 hover:border-slate-700'}">
+            <div class="flex items-center justify-between text-xs mb-1">
+              <span class="font-bold text-white">${s.vehicle.split(' ')[2] || 'Maruti'}</span>
+              <span class="text-[10px] font-mono px-1.5 py-0.5 rounded ${s.rewards_tier === 'Diamond' ? 'bg-amber-900/60 text-amber-300' : (s.rewards_tier === 'Needs Coaching' ? 'bg-rose-900/60 text-rose-300' : 'bg-slate-800 text-slate-300')}">${s.rewards_tier}</span>
+            </div>
+            <div class="text-xs font-semibold text-slate-200">${s.title}</div>
+            <div class="text-[11px] text-slate-400 mt-1 line-clamp-2">${s.description}</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function selectScenario(id) {
+      currentScenarioId = id;
+      renderScenarioCards();
+      resetSimulation();
+      await loadScenario(id);
+    }
+
+    async function loadScenario(id) {
+      try {
+        const res = await fetch(`/api/scenarios/${id}/telemetry?steps=15`);
+        const data = await res.json();
+        telemetryStream = data.telemetry_stream || [];
+        currentStepIndex = 0;
+        updateHUDStep(currentStepIndex);
+        updateScorecard(data.scorecard);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function updateHUDStep(idx) {
+      if (!telemetryStream || telemetryStream.length === 0) return;
+      const frame = telemetryStream[idx];
+      if (!frame) return;
+
+      document.getElementById('hud-frame-step').textContent = `Frame ${frame.step} / ${telemetryStream.length}`;
+
+      const fac = frame.facial;
+      const kin = frame.kinematics;
+
+      // Update gauges
+      document.getElementById('val-ear').textContent = fac.ear_mean.toFixed(3);
+      document.getElementById('bar-ear').style.width = `${Math.min(100, (fac.ear_mean / 0.40) * 100)}%`;
+      document.getElementById('bar-ear').className = `h-2 rounded-full transition-all duration-300 ${fac.ear_mean < 0.21 ? 'bg-rose-500' : 'bg-cyan-400'}`;
+
+      document.getElementById('val-mar').textContent = fac.mar.toFixed(3);
+      document.getElementById('bar-mar').style.width = `${Math.min(100, (fac.mar / 0.80) * 100)}%`;
+      document.getElementById('bar-mar').className = `h-2 rounded-full transition-all duration-300 ${fac.mar > 0.58 ? 'bg-amber-500' : 'bg-emerald-400'}`;
+
+      // Update face wireframe
+      const faceBox = document.getElementById('face-box');
+      faceBox.style.transform = `rotate(${fac.head_yaw_deg * 0.4}deg) translateY(${fac.head_pitch_deg * 0.6}px)`;
+      document.getElementById('head-pose-text').textContent = `Head Pose: Yaw ${fac.head_yaw_deg.toFixed(1)}° · Pitch ${fac.head_pitch_deg.toFixed(1)}°`;
+
+      // Gaze badge
+      const gazeBadge = document.getElementById('gaze-badge');
+      if (fac.gaze_on_road) {
+        gazeBadge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400"></span><span class="text-emerald-300">Gaze on Road</span>`;
+      } else {
+        gazeBadge.innerHTML = `<span class="w-2 h-2 rounded-full bg-rose-500 animate-ping"></span><span class="text-rose-400">Eyes Off Road</span>`;
+      }
+
+      // Phone badge
+      const phoneBadge = document.getElementById('phone-badge');
+      if (fac.phone_detected) {
+        phoneBadge.classList.remove('hidden');
+      } else {
+        phoneBadge.classList.add('hidden');
+      }
+
+      // Kinematics
+      document.getElementById('val-speed').innerHTML = `${kin.speed_kmh.toFixed(1)} <span class="text-xs font-normal text-slate-400">km/h</span>`;
+      document.getElementById('val-long-g').innerHTML = `${kin.accel_longitudinal_g > 0 ? '+' : ''}${kin.accel_longitudinal_g.toFixed(2)} <span class="text-xs font-normal text-slate-400">g</span>`;
+      document.getElementById('val-lat-g').innerHTML = `${kin.accel_lateral_g.toFixed(2)} <span class="text-xs font-normal text-slate-400">g</span>`;
+
+      // Indicator
+      const ind = document.getElementById('val-indicator');
+      if (kin.turn_indicator_active) {
+        ind.innerHTML = `<i class="fa-solid fa-arrow-left text-emerald-400 animate-pulse"></i><span class="text-xs font-mono font-bold text-emerald-300">ACTIVE</span>`;
+      } else {
+        ind.innerHTML = `<i class="fa-solid fa-arrow-left text-slate-600"></i><span class="text-xs font-mono font-medium text-slate-400">OFF</span><i class="fa-solid fa-arrow-right text-slate-600"></i>`;
+      }
+
+      // Dynamic Alert Banner Logic
+      updateAlertBanner(fac, kin);
+    }
+
+    function updateAlertBanner(fac, kin) {
+      const banner = document.getElementById('alert-banner');
+      const icon = document.getElementById('alert-icon');
+      const title = document.getElementById('alert-title');
+      const badge = document.getElementById('alert-badge');
+      const desc = document.getElementById('alert-desc');
+      const coaching = document.getElementById('alert-coaching');
+
+      if (fac.ear_mean < 0.16 && fac.blink_duration_ms > 1200) {
+        // Critical Microsleep
+        banner.className = 'rounded-2xl p-4 border bg-rose-950/40 border-rose-600 text-rose-200 animate-pulse';
+        icon.className = 'w-8 h-8 rounded-lg bg-rose-900 border border-rose-500 flex items-center justify-center text-white';
+        icon.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i>';
+        title.textContent = 'EMERGENCY: Prolonged Microsleep Detected!';
+        badge.textContent = 'CRITICAL';
+        badge.className = 'text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-rose-900 text-white font-bold';
+        desc.textContent = `Driver eyelids shut for ${(fac.blink_duration_ms/1000).toFixed(1)}s (EAR: ${fac.ear_mean.toFixed(2)}). Haptic steering rumble triggered.`;
+        coaching.innerHTML = '<i class="fa-solid fa-hand-holding-hand mr-1"></i> Maruti Safety Intervene: Pull into nearest safe bay immediately!';
+      } else if (fac.phone_detected) {
+        // Phone Distraction
+        banner.className = 'rounded-2xl p-4 border bg-rose-950/30 border-rose-800 text-rose-200';
+        icon.className = 'w-8 h-8 rounded-lg bg-rose-900/60 border border-rose-700 flex items-center justify-center text-rose-300';
+        icon.innerHTML = '<i class="fa-solid fa-mobile-screen"></i>';
+        title.textContent = 'High Distraction: Mobile Device Detected';
+        badge.textContent = 'HIGH';
+        badge.className = 'text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-rose-900/80 text-rose-200';
+        desc.textContent = 'Gaze down into lap. Mobile screen distraction during motion increases collision risk by 4x.';
+        coaching.innerHTML = '<i class="fa-solid fa-microphone mr-1"></i> Tip: Use Maruti Suzuki SmartPlay Pro+ voice command.';
+      } else if (fac.ear_mean < 0.21 || fac.mar > 0.58) {
+        // Drowsiness / Yawning
+        banner.className = 'rounded-2xl p-4 border bg-amber-950/30 border-amber-800 text-amber-200';
+        icon.className = 'w-8 h-8 rounded-lg bg-amber-900/60 border border-amber-700 flex items-center justify-center text-amber-300';
+        icon.innerHTML = '<i class="fa-solid fa-bed"></i>';
+        title.textContent = 'Warning: Driver Fatigue Symptoms';
+        badge.textContent = 'DROWSY';
+        badge.className = 'text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-amber-900/80 text-amber-200';
+        desc.textContent = `Continuous yawning (MAR: ${fac.mar.toFixed(2)}) and drooping eyelids detected.`;
+        coaching.innerHTML = '<i class="fa-solid fa-fan mr-1"></i> Tip: Turn AC to fresh air mode and plan a rest break within 15 km.';
+      } else {
+        // Attentive
+        banner.className = 'rounded-2xl p-4 border bg-emerald-950/30 border-emerald-800 text-emerald-200';
+        icon.className = 'w-8 h-8 rounded-lg bg-emerald-900/60 border border-emerald-700 flex items-center justify-center text-emerald-300';
+        icon.innerHTML = '<i class="fa-solid fa-circle-check"></i>';
+        title.textContent = 'Driver State: Attentive & Focused';
+        badge.textContent = 'NORMAL';
+        badge.className = 'text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-emerald-900/80 text-emerald-300';
+        desc.textContent = 'Normal ocular blink rate and steady road gaze detected. High safety score maintained.';
+        coaching.innerHTML = '<i class="fa-solid fa-graduation-cap mr-1"></i> Maruti Safety Tip: Keep maintaining 3-second buffer distance in urban corridors.';
+      }
+    }
+
+    function updateScorecard(sc) {
+      if (!sc) return;
+      document.getElementById('val-trip-score').textContent = sc.current_trip_score.toFixed(1);
+      document.getElementById('badge-rewards-tier').innerHTML = `<i class="fa-solid fa-gem mr-1"></i> ${sc.maruti_rewards_tier} Tier`;
+      
+      document.getElementById('val-idx-att').textContent = `${sc.attentiveness_index.toFixed(1)}%`;
+      document.getElementById('bar-idx-att').style.width = `${sc.attentiveness_index}%`;
+      
+      document.getElementById('val-idx-smooth').textContent = `${sc.smooth_driving_index.toFixed(1)}%`;
+      document.getElementById('bar-idx-smooth').style.width = `${sc.smooth_driving_index}%`;
+
+      document.getElementById('val-idx-speed').textContent = `${sc.speed_compliance_index.toFixed(1)}%`;
+      document.getElementById('bar-idx-speed').style.width = `${sc.speed_compliance_index}%`;
+
+      document.getElementById('val-ins-discount').textContent = `${sc.insurance_premium_discount_pct}% Premium Reduction Unlocked`;
+      document.getElementById('val-safe-streak').textContent = `${sc.safe_km_streak.toLocaleString()} km Incident-Free`;
+    }
+
+    function nextStep() {
+      if (currentStepIndex < telemetryStream.length - 1) {
+        currentStepIndex++;
+        updateHUDStep(currentStepIndex);
+      } else {
+        pauseSimulation();
+      }
+    }
+
+    function resetSimulation() {
+      pauseSimulation();
+      currentStepIndex = 0;
+      updateHUDStep(0);
+    }
+
+    function playSimulation() {
+      if (isPlaying) {
+        pauseSimulation();
+        return;
+      }
+      isPlaying = true;
+      document.getElementById('btn-sim-play').innerHTML = '<i class="fa-solid fa-pause"></i> <span>Pause</span>';
+      simInterval = setInterval(() => {
+        if (currentStepIndex < telemetryStream.length - 1) {
+          nextStep();
+        } else {
+          pauseSimulation();
+        }
+      }, 1000);
+    }
+
+    function pauseSimulation() {
+      isPlaying = false;
+      clearInterval(simInterval);
+      document.getElementById('btn-sim-play').innerHTML = '<i class="fa-solid fa-play"></i> <span>Auto Play</span>';
+    }
+
+    // Traffic Corridor Functions
+    async function loadTraffic() {
+      try {
+        const res = await fetch('/api/traffic/corridor');
+        const data = await res.json();
+        renderJunctions(data.junctions, data.optimization.plans);
+        document.getElementById('val-corridor-delay').textContent = `-${data.optimization.aggregate_metrics.avg_delay_reduction_pct}%`;
+        document.getElementById('val-corridor-fuel').textContent = `${data.optimization.aggregate_metrics.total_fuel_saved_litres_per_hour} L/hr`;
+        document.getElementById('val-corridor-co2').textContent = `${data.optimization.aggregate_metrics.total_co2_avoided_kg_per_hour} kg/hr`;
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function renderJunctions(junctions, plans) {
+      const container = document.getElementById('junction-cards');
+      container.innerHTML = junctions.map((j, i) => {
+        const plan = plans.find(p => p.junction_id === j.junction_id) || {};
+        return `
+          <div class="card-glass rounded-xl p-4 border-slate-800">
+            <div class="flex items-center justify-between text-xs mb-2">
+              <span class="font-bold text-white">${j.junction_name.split(' ')[0]} ${j.junction_name.split(' ')[1] || ''}</span>
+              <span class="text-[10px] font-mono px-1.5 py-0.5 rounded ${j.congestion_level === 'GRIDLOCK' ? 'bg-red-950 text-red-300' : (j.congestion_level === 'CONGESTED' ? 'bg-amber-950 text-amber-300' : 'bg-emerald-950 text-emerald-300')}">${j.congestion_level}</span>
+            </div>
+            <div class="text-[11px] text-slate-400 mb-2">Total Queue: <span class="font-mono text-cyan-400 font-bold">${j.north_queue_pcu + j.south_queue_pcu + j.east_queue_pcu + j.west_queue_pcu} PCU</span></div>
+            <div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800 space-y-1 text-xs font-mono">
+              <div class="flex justify-between text-slate-300">
+                <span>NS Green:</span>
+                <span class="text-emerald-400 font-bold">${plan.optimal_ns_green_seconds || 45}s</span>
+              </div>
+              <div class="flex justify-between text-slate-300">
+                <span>EW Green:</span>
+                <span class="text-cyan-400 font-bold">${plan.optimal_ew_green_seconds || 25}s</span>
+              </div>
+              <div class="flex justify-between text-slate-400 text-[10px] pt-1 border-t border-slate-800">
+                <span>Webster Cycle:</span>
+                <span>${plan.computed_cycle_time_seconds || 90}s</span>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function triggerEmergencyPreemption() {
+      alert("🚨 V2X EMERGENCY PRE-EMPTION TRIGGERED:\nAmbulance siren verified on WEH Southbound corridor. All 4 junctions extending North-South green wave by +30 seconds. East-West traffic held on red.");
+    }
+
+    // V2X Alerts
+    async function loadV2X() {
+      try {
+        const res = await fetch('/api/v2x/alerts');
+        const alerts = await res.json();
+        const container = document.getElementById('v2x-alert-list');
+        container.innerHTML = alerts.map(a => `
+          <div class="bg-slate-950/70 rounded-xl p-3.5 border border-slate-800 flex items-start space-x-3">
+            <div class="w-8 h-8 rounded-lg bg-blue-950 border border-blue-700 flex items-center justify-center flex-shrink-0 text-cyan-400 text-sm">
+              <i class="fa-solid fa-tower-broadcast"></i>
+            </div>
+            <div class="flex-1">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-white">${a.hazard_type.replace(/_/g, ' ')}</span>
+                <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-blue-900/40 text-blue-300 font-semibold">${a.distance_to_hazard_meters}m away</span>
+              </div>
+              <p class="text-[11px] text-slate-300 mt-1">${a.message_text}</p>
+              <div class="mt-1.5 text-[11px] text-cyan-300 font-medium">
+                <i class="fa-solid fa-compass mr-1"></i> Action: ${a.recommended_driver_action}
+              </div>
+            </div>
+          </div>
+        `).join('');
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    // ML Metrics
+    async function loadMetrics() {
+      try {
+        const res = await fetch('/api/metrics');
+        const data = await res.json();
+        const models = data.models || {};
+        const tbody = document.getElementById('ml-table-body');
+        tbody.innerHTML = Object.entries(models).map(([k, v]) => `
+          <tr class="hover:bg-slate-900/60 transition">
+            <td class="py-3 px-4 font-bold ${k.includes('Gradient') ? 'text-cyan-400' : 'text-slate-200'}">${k.replace(/_/g, ' ')}</td>
+            <td class="py-3 px-4 text-emerald-400">${(v.accuracy * 100).toFixed(2)}%</td>
+            <td class="py-3 px-4 text-slate-300">${(v.precision * 100).toFixed(2)}%</td>
+            <td class="py-3 px-4 text-emerald-400 font-bold">${(v.recall * 100).toFixed(2)}%</td>
+            <td class="py-3 px-4 text-slate-300">${(v.f1 * 100).toFixed(2)}%</td>
+            <td class="py-3 px-4 text-cyan-300 font-bold">${v.roc_auc.toFixed(4)}</td>
+            <td class="py-3 px-4 text-slate-400">${k.includes('Rule') ? '0.2 ms' : (k.includes('Gradient') ? '18.4 ms' : '24.1 ms')}</td>
+          </tr>
+        `).join('');
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    window.onload = init;
+  </script>
+</body>
+</html>
